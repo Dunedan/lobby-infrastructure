@@ -47,9 +47,8 @@ define_macro:
   'TLS_CIPHERS': "HIGH:!aNULL:!eNULL:!3DES:@STRENGTH"
   'TLS_OPTIONS':
     - "no_sslv3"
-    # - "no_tlsv1" # old windows gloox only supports TLS v1.0. Can be removed once a26 and older versions aren't supported anymore
+    - "no_tlsv1"
     - "no_tlsv1_1"
-    - "no_tlsv1_3"  # gloox 1.0.25 & 1.0.26 have TLS v1.3 enabled, but 0ad fails to connect when TLS v1.3 is enabled on server side
     - "cipher_server_preference"
     - "no_compression"
     # 'DH_FILE': "/path/to/dhparams.pem"
@@ -71,7 +70,7 @@ listen:
     shaper: c2s_shaper
     access: c2s
     starttls: true
-    starttls_required: false
+    starttls_required: true
     protocol_options: 'TLS_OPTIONS'
 #  -
 #    port: 5223
@@ -111,6 +110,16 @@ listen:
   -
     port: 3478
     transport: udp
+    module: ejabberd_stun
+  -
+    port: 5349
+    transport: udp
+    tls: true
+    cert_file: /etc/letsencrypt/live/localhost/fullchain.pem
+    use_turn: true
+    turn_ipv4_address: 127.0.0.1
+    auth_type: user
+    auth_realm: localhost
     module: ejabberd_stun
 #    ip: "0.0.0.0"
 #    use_turn: true
@@ -282,8 +291,6 @@ modules:
   ##     "Access-Control-Allow-Origin": "https://@HOST@"
   ##     "Access-Control-Allow-Methods": "GET,HEAD,PUT,OPTIONS"
   ##     "Access-Control-Allow-Headers": "Content-Type"
-  ## ipstamp module used by XpartaMuPP to insert IP addresses into the gamelist
-  mod_ipstamp: {}
   mod_last: {}
   mod_mam:
     access_preferences: mam_modify
@@ -360,7 +367,7 @@ modules:
 #  mod_sic: {}
   mod_stream_mgmt:
     resend_on_timeout: if_offline
-#  mod_stun_disco: {}
+  mod_stun_disco: {}
 #  mod_vcard:
 #    search: false
 #  mod_vcard_xupdate: {}
