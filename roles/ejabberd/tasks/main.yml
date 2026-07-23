@@ -113,6 +113,36 @@
     state: restarted
   when: localhost_cert_exists.stat.isreg is not defined
 
+- name: Create private key for a dummy CA
+  community.crypto.openssl_privatekey:
+    path: /etc/ejabberd/dummy-ca.key
+    owner: ejabberd
+    group: ejabberd
+    mode: 0644
+
+- name: Create certificate signing request (CSR) for a dummy CA certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: /etc/ejabberd/dummy-ca.key
+    common_name: Wildfire Games Lobby CA
+    use_common_name_for_san: false
+    basic_constraints:
+      - 'CA:TRUE'
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+    key_usage_critical: true
+  register: ca_csr
+
+- name: Create self-signed root CA certificate for the dummy CA from CSR
+  community.crypto.x509_certificate:
+    path: /etc/ejabberd/dummy-ca.pem
+    csr_content: "{{ ca_csr.csr }}"
+    privatekey_path: /etc/ejabberd/dummy-ca.key
+    provider: selfsigned
+    owner: ejabberd
+    group: ejabberd
+    mode: 0644
+
 - name: Ensure ejabberd is enabled and running
   ansible.builtin.systemd:
     name: ejabberd
