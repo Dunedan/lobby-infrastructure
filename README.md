@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This repository moved to a new location. It's now available at https://gitea.wildfiregames.com/0ad/lobby-infrastructure
+
 # Pyrogenesis multiplayer-lobby Infrastructure-as-Code
 
 This repository contains the Ansible playbooks which are used to manage the official multiplayer
